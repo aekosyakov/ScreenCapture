@@ -95,6 +95,7 @@ class ScreenCapture: NSObject {
     public
     func stop() {
         session.stopRunning()
+        onFinish?()
     }
 
 }
@@ -107,6 +108,7 @@ extension ScreenCapture : AVCaptureVideoDataOutputSampleBufferDelegate {
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
         }
+        onStart?()
         onDataStream?(imageBuffer)
 //        let ciImage = CIImage(cvImageBuffer: imageBuffer)
 //        let context = CIContext()
