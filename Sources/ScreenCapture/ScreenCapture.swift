@@ -36,11 +36,11 @@ class ScreenCapture: NSObject {
     init(
         framesPerSecond: Int = 60,
         cropRect: CGRect? = NSScreen.main?.frame,
-        showCursor: Bool,
-        highlightClicks: Bool,
+        showCursor: Bool = true,
+        highlightClicks: Bool = true,
         screenId: CGDirectDisplayID = .main,
         audioDevice: AVCaptureDevice? = .default(for: .audio),
-        videoCodec: AVVideoCodecType?
+        videoCodec: AVVideoCodecType? = nil
     ) throws {
         session = AVCaptureSession()
         

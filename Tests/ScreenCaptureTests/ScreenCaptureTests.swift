@@ -3,10 +3,10 @@ import XCTest
 
 final class ScreenCaptureTests: XCTestCase {
     func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-//        XCTAssertEqual(ScreenCapture().text, "Hello, World!")
+        let capture = try? ScreenCapture()
+//        capture?.start()
+//        capture?.onDataStream = { print($0) }
+        XCTAssert(capture != nil)
     }
 
     static var allTests = [
