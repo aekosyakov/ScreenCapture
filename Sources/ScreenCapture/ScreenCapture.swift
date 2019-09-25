@@ -90,6 +90,7 @@ class ScreenCapture: NSObject {
         outputStream.open()
         output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sample buffer"))
         session.startRunning()
+        onStart?()
     }
     
     public
