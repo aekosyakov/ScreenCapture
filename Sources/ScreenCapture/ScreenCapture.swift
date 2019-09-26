@@ -28,9 +28,6 @@ class ScreenCapture: NSObject {
 
     
     public let devices = Devices.self
-    
-    public lazy
-    var outputStream = OutputStream()
 
     public
     init(
@@ -86,8 +83,6 @@ class ScreenCapture: NSObject {
     
     public
     func start() {
-        outputStream.schedule(in: .main, forMode: .default)
-        outputStream.open()
         output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sample buffer"))
         session.startRunning()
         onStart?()
@@ -111,15 +106,15 @@ extension ScreenCapture : AVCaptureVideoDataOutputSampleBufferDelegate {
         }
         onStart?()
         onDataStream?(imageBuffer)
-//        let ciImage = CIImage(cvImageBuffer: imageBuffer)
-//        let context = CIContext()
-//        let size = CGSize(width: CVPixelBufferGetWidth(imageBuffer), height: CVPixelBufferGetHeight(imageBuffer))
-//        guard let cgImage = context.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: size.width, height: size.height)) else {
-//            return
-//        }
-//        let image = NSImage(cgImage: cgImage, size: size)
-////        print("captureOutput sample buffer \(sampleBuffer) image size \(image.size)")
-//        imageStream?(image)
+        let ciImage = CIImage(cvImageBuffer: imageBuffer)
+        let context = CIContext()
+        let size = CGSize(width: CVPixelBufferGetWidth(imageBuffer), height: CVPixelBufferGetHeight(imageBuffer))
+        guard let cgImage = context.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: size.width, height: size.height)) else {
+            return
+        }
+        let image = NSImage(cgImage: cgImage, size: size)
+//        print("captureOutput sample buffer \(sampleBuffer) image size \(image.size)")
+        imageStream?(image)
 //
 //        let bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer)
 //        let height = CVPixelBufferGetHeight(imageBuffer)
