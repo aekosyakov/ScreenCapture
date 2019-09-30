@@ -23,10 +23,8 @@ class ScreenCapture: NSObject {
     public var onError: ((Error) -> Void)?
     public var onPause: (() -> Void)?
     public var onResume: (() -> Void)?
-    public var imageStream: ((NSImage?) -> Void)?
-    public var onDataStream: ((CVImageBuffer) -> Void)?
+    public var onDataStream: ((Data) -> Void)?
 
-    
     public let devices = Devices.self
 
     public
@@ -104,37 +102,17 @@ extension ScreenCapture : AVCaptureVideoDataOutputSampleBufferDelegate {
         guard let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
         }
-        onStart?()
-        onDataStream?(imageBuffer)
-        let ciImage = CIImage(cvImageBuffer: imageBuffer)
-        let context = CIContext()
-        let size = CGSize(width: CVPixelBufferGetWidth(imageBuffer), height: CVPixelBufferGetHeight(imageBuffer))
-        guard let cgImage = context.createCGImage(ciImage, from: CGRect(x: 0, y: 0, width: size.width, height: size.height)) else {
+        CVPixelBufferLockBaseAddress(imageBuffer,[])
+        let bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer)
+        let height = CVPixelBufferGetHeight(imageBuffer)
+        let cvBuff = CVPixelBufferGetBaseAddress(imageBuffer)
+        CVPixelBufferUnlockBaseAddress(imageBuffer, []);
+        guard let cvBuffer = cvBuff else {
+            print("buff nil")
             return
         }
-        let image = NSImage(cgImage: cgImage, size: size)
-//        print("captureOutput sample buffer \(sampleBuffer) image size \(image.size)")
-        imageStream?(image)
-//
-//        let bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer)
-//        let height = CVPixelBufferGetHeight(imageBuffer)
-//        let src_buff = CVPixelBufferGetBaseAddress(imageBuffer)
-//
-//        CVPixelBufferUnlockBaseAddress(imageBuffer, []);
-//
-//        let data = NSData(bytes: src_buff, length: bytesPerRow * height)
-//        socket.write(data: data as Data)
-//        _ = outputStream.write(data: data as Data)
-//        print("image data \(data.description)")
+        let data = Data(bytes: cvBuffer, count: bytesPerRow * height)
+        onDataStream?(data)
     }
     
-}
-
-private
-extension OutputStream {
-    
-    func write(data: Data) -> Int {
-        return data.withUnsafeBytes { write($0, maxLength: data.count) }
-    }
-
 }
